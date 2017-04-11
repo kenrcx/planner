@@ -21,6 +21,7 @@
   %>
   <input type="button" onclick="location.href='/showEvent.jsp'"value="イベント一覧"><br>
   <input type="button" onclick="location.href='/addEvent.jsp'"value="イベント登録"><br>
+  <input type="button" onclick="location.href='/logout'"value="ログアウト"><br>
   <%
   }
   %>
