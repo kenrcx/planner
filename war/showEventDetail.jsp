@@ -28,6 +28,14 @@ Event event = events.get(0);
 <br>
 <br>
 <input type="button" onclick="location.href='/editEvent.jsp?eventId=<%=eventId%>'"value="イベント編集">
+
+<form action="/joinEvent" method="post">
+    <p>イベントに参加</p>
+    <p><input type="radio" name="isJoin" value="true">参加する</p>
+    <p><input type="radio" name="isJoin" value="false">参加しない</p>
+    <input type="hidden" value="<%=eventId%>" name="eventId">
+    <input type="submit">
+</form>
 <%
 }else{
 	response.sendRedirect("/");
