@@ -44,6 +44,7 @@ public class LoginServlet extends HttpServlet {
                 newSession.setAttribute("id", user.getUserId());
                 response.sendRedirect("/");
             }else{
+                //TODO ログイン失敗処理を実装する
                 response.sendRedirect("/ng");
             }
         }else {

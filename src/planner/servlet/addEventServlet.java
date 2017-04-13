@@ -10,6 +10,7 @@ import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 //import com.google.api.server.spi.types.SimpleDate;
 import planner.PMF;
@@ -26,22 +27,46 @@ public class addEventServlet extends HttpServlet {
         response.setContentType("text/html; charset=UTF-8");
         String title = request.getParameter("title");
         title =Sanitizer.convertSanitize(title);
+        //日付を取得し、フォーマッタを通してDate型に変換
         Date date = null;
         try {
             date = format.parse(request.getParameter("date"));
         } catch (ParseException e) {
         	date = null;
         }
+
+        Date deadLine = null;
+        try{
+            date = format.parse(request.getParameter("deadline"));
+        }catch (ParseException e){
+            date = null;
+        }
+
+        //開催日数がnullの場合があるのでtry-catch
         int length;
         try{
         	length = Integer.parseInt(request.getParameter("length"));
         }catch(NumberFormatException e){
         	length = 0;
         }
+
         String description = request.getParameter("description");
         description =Sanitizer.convertSanitize(description);
+
+        Boolean isInvest = Boolean.valueOf(request.getParameter("isInvest"));
+        if(isInvest == null){
+            isInvest = false;
+        }
+
+        HttpSession session =  request.getSession(false);
+        String ownerId = String.valueOf(session.getAttribute("id"));
+
+
+
+        //イベントIDを生成
         String eventId = UUID.randomUUID().toString();
-        Event event = new Event(eventId, title, date, length, description);
+
+        Event event = new Event(eventId, title, date, length, description, ownerId, isInvest, deadLine);
 
         PersistenceManager pm = PMF.get().getPersistenceManager();
 

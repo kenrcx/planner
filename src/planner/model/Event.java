@@ -12,14 +12,16 @@ import java.util.Date;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Event {
 
-    public Event(String eventId, String title, Date date, int length, String description) {
+    public Event(String eventId, String title, Date date, int length, String description, String eventOwner, boolean isInvestigating, Date investigationDeadLine) {
         this.eventId = eventId;
         this.title = title;
         this.date = date;
         this.length = length;
         this.description = description;
+        this.eventOwner = eventOwner;
+        this.isInvestigating = isInvestigating;
+        this.investigationDeadLine = investigationDeadLine;
     }
-
 
     @PrimaryKey
     @Persistent
@@ -37,6 +39,15 @@ public class Event {
     @Persistent
     private String description;
 
+
+    @Persistent
+    private String eventOwner;
+
+    @Persistent
+    private boolean isInvestigating;
+
+    @Persistent
+    private Date investigationDeadLine;
 
 
     public String getEventId() {
@@ -74,6 +85,26 @@ public class Event {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getEventOwner() {
+        return eventOwner;
+    }
+
+    public boolean isInvestigating() {
+        return isInvestigating;
+    }
+
+    public void setInvestigating(boolean investigating) {
+        isInvestigating = investigating;
+    }
+
+    public Date getInvesigationDeadLine() {
+        return investigationDeadLine;
+    }
+
+    public void setInvestigationDeadLine(Date investigationDeadLine) {
+        this.investigationDeadLine = investigationDeadLine;
     }
 
 

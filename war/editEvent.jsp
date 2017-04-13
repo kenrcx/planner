@@ -44,6 +44,11 @@
     <p> <input type="number" name="length" min="1" max="100" value="<%=event.getLength()%>" >日間</p>
     <p>詳細</p>
     <p><textarea name="description" rows="4" cols="20"><%=event.getDescription()%></textarea></p>
+    <p>参加アンケートを</p>
+    <p><input type="radio" name="isInvest" value="true" >行う</p>
+    <p><input type="radio" name="isInvest" value="false">行わない</p>
+
+    <p>アンケート締め切り<input type="date" name="deadline"></p>
     <p><input type="submit"></p>
 
 </form>
