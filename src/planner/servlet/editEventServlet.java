@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -53,11 +54,11 @@ public class editEventServlet extends HttpServlet {
             date = null;
         }
 
-        Date deadLine = null;
+        Date deadLine = date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
         try{
         	deadLine = format.parse(request.getParameter("deadline"));
         }catch (ParseException e){
-        	deadLine = null;
+            date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
         }
 
         int length;

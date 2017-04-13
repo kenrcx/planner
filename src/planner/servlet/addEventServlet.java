@@ -3,7 +3,9 @@ package planner.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import javax.jdo.PersistenceManager;
@@ -35,11 +37,12 @@ public class addEventServlet extends HttpServlet {
         	date = null;
         }
 
-        Date deadLine = null;
+        Date deadLine = date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
         try{
-            date = format.parse(request.getParameter("deadline"));
+            deadLine = format.parse(request.getParameter("deadline"));
         }catch (ParseException e){
-            date = null;
+            date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
+
         }
 
         //開催日数がnullの場合があるのでtry-catch
