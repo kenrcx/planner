@@ -10,6 +10,8 @@
 <%@ page import="planner.model.EventJoin" %>
 <%@ page import="planner.model.User" %>
 <%@ page import="javax.jws.soap.SOAPBinding" %>
+<%@ page import="com.google.appengine.api.datastore.Key" %>
+<%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
 <html>
 <head>
     <title>Title</title>
@@ -19,17 +21,16 @@
     if (session.getAttribute("id") != null) {
         String eventId = request.getParameter("eventId");
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        Query eventQuery = pm.newQuery(Event.class);
-        eventQuery.setFilter("eventId == paramId");
-        eventQuery.declareParameters("String paramId");
-        List<Event> events = (List<Event>) eventQuery.execute(eventId);
-        Event event = events.get(0);
+        Key k = KeyFactory.stringToKey(eventId);
+        Event event = pm.getObjectById(Event.class, k);
 
-        Query ownerQuery = pm.newQuery(User.class);
-        ownerQuery.setFilter("userId == paramId");
-        ownerQuery.declareParameters("String paramId");
-        List<User> owners = (List<User>) ownerQuery.execute(event.getEventOwner());
-        User owner = owners.get(0);
+        User owner = event.getEventOwner();
+
+        Key userId = (Key)session.getAttribute("id");
+
+
+        User user = pm.getObjectById(User.class, userId);
+
 
 
 %>
@@ -45,10 +46,6 @@
 <br>
 <HR>
 <%
-    Query eventJoinQuery = pm.newQuery(EventJoin.class);
-    eventJoinQuery.setFilter("eventId == paramId");
-    eventJoinQuery.declareParameters("String paramId");
-    List<EventJoin> joinUsers = (List<EventJoin>) eventJoinQuery.execute(eventId);
 
 %>
 <!--
@@ -63,14 +60,10 @@
     <%
         //TODO 参加予定/不参加予定を分けて表示する
         int memberCount = 0;
-        if (joinUsers.size() > 0) {
-            for (EventJoin e : joinUsers) {
-                Query userQuery = pm.newQuery(User.class);
-                userQuery.setFilter("userId == paramId");
-                userQuery.declareParameters("String paramId");
-                List<User> users = (List<User>) userQuery.execute(e.getUserId());
-                User user = users.get(0);
-                if (user != null) {
+        if (event.getEventjoins().size() > 0) {
+            for (EventJoin e : event.getEventjoins()) {
+                User tmp = e.getUser();
+                if (tmp != null) {
                     if (e.isJoin() == true) {
                         memberCount++;
                     }
@@ -109,7 +102,7 @@
     <p><input type="radio" name="isJoin" value="false">参加しない</p>
     <input type="hidden" value="<%=eventId%>" name="eventId">
     <%
-      if(isDeadLineActive == true){
+      if(isDeadLineActive == true && event.getInvesigationDeadLine() != null){
     %>
         <p>締め切り:<%=event.getInvesigationDeadLine()%></p>
     <%
@@ -123,9 +116,10 @@
     }
 %>
 <%
-    if (event.getEventOwner().equals(session.getAttribute("id"))) {
+    if (event.getEventOwner().equals(user)) {
+        String key = KeyFactory.keyToString(event.getEventId());
 %>
-<input type="button" onclick="location.href='/editEvent.jsp?eventId=<%=eventId%>'" value="イベント編集">
+<input type="button" onclick="location.href='/editEvent.jsp?eventId=<%=key%>'" value="イベント編集">
 <%
         }
     } else {

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import planner.PMF;
+import planner.PasswordHash;
 import planner.Sanitizer;
 import planner.model.User;
 
@@ -25,15 +26,18 @@ public class UserRegistServlet extends HttpServlet {
         email = Sanitizer.convertSanitize(email);
         String password = request.getParameter("password");
 
-        String id = UUID.randomUUID().toString();
 
-        User user = new User(id, name, email, password);
+        User user = new User(name, email);
 
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
         pm.makePersistent(user);
 
+        user.setHashedPassword(PasswordHash.getPasswordHash(user.getUserId(), password));
+
         pm.close();
+
+
 
         response.sendRedirect("/");
 

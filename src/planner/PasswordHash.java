@@ -20,8 +20,8 @@ public class PasswordHash {
      */
     private static final String FIXEDSALT = "dsfkgdflksjgkldfsjgkdlsfjgfckljgdfshgjdkf";
 
-    public static String getPasswordHash(String userId, String password) {
-        return getHash(password, getSalt(userId));
+    public static String getPasswordHash(com.google.appengine.api.datastore.Key key, String password) {
+        return getHash(password, getSalt(key.toString()));
     }
 
     private static String getHash(String target, String salt){
