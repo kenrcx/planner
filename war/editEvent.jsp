@@ -12,6 +12,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="planner.PMF" %>
 <%@ page import="planner.model.Event" %>
+<%@ page import="com.google.appengine.api.datastore.Key" %>
+<%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
 <html>
 <head>
     <%
@@ -22,11 +24,8 @@
         //編集するイベントの現在の情報を取得
         String eventId = request.getParameter("eventId");
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        Query query = pm.newQuery(Event.class);
-        query.setFilter("eventId == paramId");
-        query.declareParameters("String paramId");
-        List<Event> events = (List<Event>) query.execute(eventId);
-        Event event = events.get(0);
+        Key key = KeyFactory.stringToKey(eventId);
+        Event event = pm.getObjectById(Event.class, key);
         //存在しないイベントの場合は500を返す
         if (event == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);

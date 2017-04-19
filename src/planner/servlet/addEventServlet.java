@@ -3,21 +3,23 @@ package planner.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.UUID;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //import com.google.api.server.spi.types.SimpleDate;
+import com.google.appengine.api.datastore.Key;
+
 import planner.PMF;
 import planner.Sanitizer;
 import planner.model.Event;
+import planner.model.User;
 
 /**
  * Created by Ken on 2017/04/09.
@@ -62,16 +64,17 @@ public class addEventServlet extends HttpServlet {
         }
 
         HttpSession session =  request.getSession(false);
-        String ownerId = String.valueOf(session.getAttribute("id"));
-
-
-
-        //イベントIDを生成
-        String eventId = UUID.randomUUID().toString();
-
-        Event event = new Event(eventId, title, date, length, description, ownerId, isInvest, deadLine);
+        Key ownerId = (Key)session.getAttribute("id");
 
         PersistenceManager pm = PMF.get().getPersistenceManager();
+
+
+        User owner = pm.getObjectById(User.class, ownerId);
+
+
+        Event event = new Event(title, date, length, description, owner, isInvest, deadLine);
+
+
 
         pm.makePersistent(event);
 

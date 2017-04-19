@@ -10,8 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import planner.PMF;
+import planner.model.Event;
 import planner.model.EventJoin;
+import planner.model.User;
 
 /**
  * Created by Ken on 2017/04/11.
@@ -21,25 +25,33 @@ public class JoinEventServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String eventId = request.getParameter("eventId");
         HttpSession session = request.getSession(false);
-        String userId = String.valueOf(session.getAttribute("id"));
+
         Boolean isJoin = Boolean.valueOf(request.getParameter("isJoin"));
 
-        PersistenceManager pm = PMF.get().getPersistenceManager();
-        Query query = pm.newQuery(EventJoin.class);
-        query.setFilter("eventId == paramEventId & userId == paramUserId");
-        query.declareParameters("String paramEventId, String paramUserId");
-        List<EventJoin> users = (List<EventJoin>)query.execute(eventId, userId);
+        Key userId = (Key)session.getAttribute("id");
 
-        if(users.isEmpty() == true){
-            EventJoin eventJoin = new EventJoin(eventId, userId, isJoin);
-            pm.makePersistent(eventJoin);
-        }else{
-            EventJoin eventJoin = users.get(0);
-            eventJoin.setJoin(isJoin);
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+
+
+        User user = pm.getObjectById(User.class, userId);
+
+        Key eventKey = KeyFactory.stringToKey(eventId);
+        Event event = pm.getObjectById(Event.class, eventKey);
+
+        List<EventJoin> eventJoins =  event.getEventjoins();
+
+        for(EventJoin e:eventJoins){
+            if(e.getUser().equals(user)){
+                e.setJoin(isJoin);
+                pm.close();
+                response.sendRedirect("/showEventDetail.jsp?eventId=" + eventId);
+            }
         }
 
 
+        EventJoin eventJoin = new EventJoin(user, event, isJoin);
 
+        event.addEventJoins(eventJoin);
 
         pm.close();
 

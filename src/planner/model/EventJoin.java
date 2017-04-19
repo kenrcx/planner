@@ -2,44 +2,49 @@ package planner.model;
 
 import javax.jdo.annotations.*;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 /**
  * Created by Ken on 2017/04/11.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class EventJoin {
 
-    public EventJoin(String eventId, String userId, boolean isJoin){
-        this.eventId = eventId;
-        this.userId = userId;
+    public EventJoin(User user, Event event ,boolean isJoin) {
+        this.user = user;
+        this.event = event;
         this.isJoin = isJoin;
     }
+
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Long id;
+    private Key id;
 
     @Persistent
-    private String eventId;
+    @Unowned
+    private Event event;
 
     @Persistent
-    private String userId;
+    @Unowned
+    private User user;
 
     @Persistent
     private boolean isJoin;
 
-    public String getEventId() {
-        return eventId;
+    public Key getId() {
+        return id;
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
+
+
+
+    public User getUser() {
+        return user;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public boolean isJoin() {
@@ -49,4 +54,7 @@ public class EventJoin {
     public void setJoin(boolean join) {
         isJoin = join;
     }
+
+
+
 }

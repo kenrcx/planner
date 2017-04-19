@@ -3,7 +3,11 @@
 <%@ page import="planner.PMF" %>
 <%@ page import="javax.jdo.PersistenceManager" %>
 <%@ page import="planner.model.Event" %>
-<%@ page import="java.util.List" %><%--
+<%@ page import="java.util.List" %>
+<%@ page import="com.google.appengine.api.datastore.Key" %>
+<%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
+<%--
+
   Created by IntelliJ IDEA.
   User: Ken
   Date: 2017/04/09
@@ -33,9 +37,10 @@
             List<Event> eventList = (List<Event>)query.executeWithArray();
 
             for(Event e:eventList){
+                String key = KeyFactory.keyToString(e.getEventId());
         %>
         <tr>
-            <td><a href="showEventDetail.jsp?eventId=<%=e.getEventId()%>"><%=e.getTitle()%> </a> </td>
+            <td><a href="showEventDetail.jsp?eventId=<%=key%>"><%=e.getTitle()%> </a> </td>
             <td><%=e.getDate() != null? e.getDate().toString() : ""%></td>
         </tr>
         <%

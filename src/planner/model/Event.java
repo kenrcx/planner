@@ -1,10 +1,18 @@
 package planner.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import java.util.Date;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.datanucleus.annotations.Unowned;
 
 /**
  * Created by Ken on 2017/04/09.
@@ -12,8 +20,7 @@ import java.util.Date;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Event {
 
-    public Event(String eventId, String title, Date date, int length, String description, String eventOwner, boolean isInvestigating, Date investigationDeadLine) {
-        this.eventId = eventId;
+    public Event(String title, Date date, int length, String description, User eventOwner, boolean isInvestigating, Date investigationDeadLine) {
         this.title = title;
         this.date = date;
         this.length = length;
@@ -21,11 +28,12 @@ public class Event {
         this.eventOwner = eventOwner;
         this.isInvestigating = isInvestigating;
         this.investigationDeadLine = investigationDeadLine;
+        this.eventjoins = new ArrayList<>();
     }
 
     @PrimaryKey
-    @Persistent
-    private String eventId;
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key eventId;
 
     @Persistent
     private String title;
@@ -41,7 +49,8 @@ public class Event {
 
 
     @Persistent
-    private String eventOwner;
+    @Unowned
+    private User eventOwner;
 
     @Persistent
     private boolean isInvestigating;
@@ -49,8 +58,13 @@ public class Event {
     @Persistent
     private Date investigationDeadLine;
 
+    @Persistent(mappedBy = "event", defaultFetchGroup = "true")
+    @Element(dependent = "true")
+    @Unowned
+    private List<EventJoin> eventjoins;
 
-    public String getEventId() {
+
+    public Key getEventId() {
         return eventId;
     }
 
@@ -87,7 +101,7 @@ public class Event {
         this.description = description;
     }
 
-    public String getEventOwner() {
+    public User getEventOwner() {
         return eventOwner;
     }
 
@@ -105,6 +119,14 @@ public class Event {
 
     public void setInvestigationDeadLine(Date investigationDeadLine) {
         this.investigationDeadLine = investigationDeadLine;
+    }
+
+    public List<EventJoin> getEventjoins(){
+        return this.eventjoins;
+    }
+
+    public void addEventJoins(EventJoin eventJoin){
+        this.eventjoins.add(eventJoin);
     }
 
 

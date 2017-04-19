@@ -14,9 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import planner.PMF;
 import planner.Sanitizer;
 import planner.model.Event;
+import planner.model.User;
 
 /**
  * Created by Ken on 2017/04/11.
@@ -27,19 +30,16 @@ public class editEventServlet extends HttpServlet {
 
         String eventId =request.getParameter("eventId");
         HttpSession session = request.getSession(false);
-        String userId = String.valueOf(session.getAttribute("id"));
+        Key userId = (Key)session.getAttribute("id");
 
 
 
         //編集するイベントの情報を取得
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        Query query = pm.newQuery(Event.class);
-        query.setFilter("eventId == paramId");
-        query.declareParameters("String paramId");
-        List<Event> events = (List<Event>) query.execute(eventId);
-        Event event = events.get(0);
+        Key key = KeyFactory.stringToKey(eventId);
+        Event event = pm.getObjectById(Event.class, key);
 
-        if(event.getEventOwner().equals(userId) == false){
+        if(event.getEventOwner().equals(pm.getObjectById(User.class, userId)) == false){
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
 
@@ -54,11 +54,11 @@ public class editEventServlet extends HttpServlet {
             date = null;
         }
 
-        Date deadLine = date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
+        Date deadLine = null;
         try{
         	deadLine = format.parse(request.getParameter("deadline"));
         }catch (ParseException e){
-            date = new GregorianCalendar(2100, 1, 1, 0, 0, 0).getTime();
+            deadLine = null;
         }
 
         int length;
@@ -69,7 +69,7 @@ public class editEventServlet extends HttpServlet {
         }
 
         String description = request.getParameter("description");
-        description =Sanitizer.convertSanitize(description);
+        description = Sanitizer.convertSanitize(description);
 
         Boolean isInvest = Boolean.valueOf(request.getParameter("isInvest"));
 

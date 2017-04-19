@@ -1,11 +1,11 @@
 package planner.model;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-
-import planner.PasswordHash;
+import com.google.appengine.api.datastore.Key;
 
 /**
  * Created by Ken on 2017/04/08.
@@ -15,8 +15,8 @@ public class User {
 
 
     @PrimaryKey
-    @Persistent
-    private String userId;
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key userId;
 
     @Persistent
     private String name;
@@ -28,14 +28,12 @@ public class User {
     private String mailAddress;
 
 
-    public User(String userId, String name, String mailAddress, String password){
-        this.userId = userId;
+    public User(String name, String mailAddress){
         this.name = name;
         this.mailAddress = mailAddress;
-        this.hashedPassword = PasswordHash.getPasswordHash(userId, password);
     }
 
-    public String getUserId() {
+    public Key getUserId() {
         return userId;
     }
 
